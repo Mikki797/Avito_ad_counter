@@ -1,32 +1,31 @@
 import pickle
 from multiprocessing.dummy import Pool as ThreadPool
-from api import load_json
+from api import _load_json
 import schedule
 from datetime import datetime
+import psycopg2
+from database import INPUT_TABLE_NAME, Database as db
+from api_types import TimestampTableType
 
 URL_items = r"https://m.avito.ru/api/9/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&" \
-            r"lastStamp=1600000000&locationId={locationId}&query='{query}'&page=1&limit=5"
+            r"lastStamp=1606926801&locationId={locationId}&query='{query}'&page=1&limit=5"
 
 
-def get_count(item):
-    id = item[1]
+def get_count(record):
+    id, query, locationId = record
 
     timeStamp = int(datetime.now().timestamp())
-    json_data = load_json(URL_items.format(query=item[0][0], locationId=item[0][1]))
+    json_data = _load_json(URL_items.format(query=query, locationId=locationId))
     if json_data['status'] == 'ok':
-        print(f"id: {id}, mainCount: {json_data['result']['mainCount']}, timeStamp: {timeStamp}")
-    else:
-        print(json_data)
+        mainCount = json_data['result']['mainCount']
+        item = TimestampTableType(requestId=id, timeStamp=timeStamp, count=mainCount)
+        db.add_timestamp(item)
 
 
 def main_func():
-    print(f'start - {datetime.now()}')
-    with open('data.pickle', 'rb') as f:
-        data = pickle.load(f)
-    print(data)
-    pool = ThreadPool()
-    pool.map(get_count, data.items())
-    print(f'finish - {datetime.now()}\n')
+    for record_list in db.get_requests(size=10):
+        pool = ThreadPool()
+        pool.map(get_count, record_list)
 
 
 schedule.every().minute.do(main_func)

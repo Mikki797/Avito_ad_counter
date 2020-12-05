@@ -1,48 +1,61 @@
 import requests
-from datetime import datetime
-from math import floor
 import json
 from fastapi import FastAPI, HTTPException
-from database import Database, ItemType, StatInputType
-from time import sleep
+from api_types import AddInputType, StatInputType
+from database import Database as db
+from typing import Dict, Any
+from pydantic.error_wrappers import ValidationError
+from typing import Optional
+from datetime import datetime
 
 
 URL_locations = r"https://m.avito.ru/api/1/slocations?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&limit=5&" \
                 r"q={location}"
 
 
-def load_json(url: str) -> dict:
+def _load_json(url: str) -> Dict[Any, Any]:
     session = requests.Session()
 
-    request = session.get(url)
+    response = session.get(url)
     try:
-        json_data = json.loads(request.text)
+        json_data = response.json()
         return json_data
     except json.decoder.JSONDecodeError:
         raise RuntimeError(f'Доступ по ссылке {url} заблокирован')
 
 
 app = FastAPI(title='avito-test')
-db = Database()
 
 @app.post('/add',
           response_description="Id добавленной связки запрос + регион")
-async def add(item: ItemType):
-    location_json = load_json(URL_locations.format(location=item.location))
+async def add(item: AddInputType) -> Dict[str, Any]:
+    location_json = _load_json(URL_locations.format(location=item.location))
     locations = location_json['result']['locations']
     if len(locations) == 0:
         raise HTTPException(400, 'Регион не найден')
 
     locationId = locations[0]['id']
-    item.location = str(locationId)
-    itemId = db.add(item)
+    item.location = locationId
+    itemId = db.add_request(item)
     return {'status': 'ok', 'id': itemId}
 
 
-@app.get('/stat',
+@app.get('/stat/{id}',
          response_description="Счётчики и соответствующие им временные метки")
-async def stat(item: StatInputType):
-    timeStamp = floor(datetime.now().timestamp())
+async def stat(id: int, date1: Optional[int] = None, date2: Optional[int] = None) -> Dict[str, Any]:
+    if date1 is None:
+        date1 = 0
 
-    id = db.add(item)
-    return {'status': 'ok', 'id': id}
+    if date2 is None:
+        date2 = int(datetime.now().timestamp())
+
+    # try:
+    item = StatInputType(id=id, date1=date1, date2=date2)
+    # except ValidationError:
+    #     raise HTTPException(400, 'Неверные данные')
+
+    if item.date1 > item.date2:
+        raise HTTPException(400, 'Временная метка начала интервала больше временной метки конца интервала')
+
+    result = db.get_timestamps(item)
+    return {'status': 'ok', 'result': result}
