@@ -1,7 +1,9 @@
-from multiprocessing.dummy import Pool as ThreadPool
-from api import _load_json
 import schedule
+
+from multiprocessing.dummy import Pool as ThreadPool
 from datetime import datetime
+
+from api import _load_json
 from database import Database as db
 from api_types import TimestampTableType
 

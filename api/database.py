@@ -1,6 +1,8 @@
 import psycopg2
-from api_types import AddInputType, StatInputType, TimestampTableType
+
 from typing import Iterable, List, Tuple
+
+from api_types import AddInputType, StatInputType, TimestampTableType
 
 DB_NAME = 'avito_api_db'
 DB_USER = 'postgres'

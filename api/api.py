@@ -1,12 +1,12 @@
 import requests
 import json
+
+from datetime import datetime
 from fastapi import FastAPI, HTTPException
+from typing import Dict, Any, Optional
+
 from api_types import AddInputType, StatInputType
 from database import Database as db
-from typing import Dict, Any
-from typing import Optional
-from datetime import datetime
-
 
 URL_locations = r"https://m.avito.ru/api/1/slocations?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&limit=5&" \
                 r"q={location}"
