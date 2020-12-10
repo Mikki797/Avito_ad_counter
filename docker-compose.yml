@@ -1,0 +1,24 @@
+version: "3.7"
+
+services:
+  db:
+    build: db/
+    container_name: avito_test_db
+
+  server:
+    build: api/
+    container_name: avito_test_server
+    command: python main.py
+    depends_on:
+      - db
+    restart: always
+
+  api:
+    build: api/
+    container_name: avito_test_api
+    command: uvicorn api:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - 8000:8000
+    depends_on:
+      - db
+      - server

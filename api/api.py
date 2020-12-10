@@ -4,7 +4,6 @@ from fastapi import FastAPI, HTTPException
 from api_types import AddInputType, StatInputType
 from database import Database as db
 from typing import Dict, Any
-from pydantic.error_wrappers import ValidationError
 from typing import Optional
 from datetime import datetime
 
@@ -49,13 +48,14 @@ async def stat(id: int, date1: Optional[int] = None, date2: Optional[int] = None
     if date2 is None:
         date2 = int(datetime.now().timestamp())
 
-    # try:
     item = StatInputType(id=id, date1=date1, date2=date2)
-    # except ValidationError:
-    #     raise HTTPException(400, 'Неверные данные')
 
     if item.date1 > item.date2:
         raise HTTPException(400, 'Временная метка начала интервала больше временной метки конца интервала')
 
-    result = db.get_timestamps(item)
+    result = []
+    for tup in db.get_timestamps(item):
+        res: str = tup[0]
+        timeStamp, count = map(int, res[1:-1].split(','))
+        result.append({"timeStamp": timeStamp, "count": count})
     return {'status': 'ok', 'result': result}

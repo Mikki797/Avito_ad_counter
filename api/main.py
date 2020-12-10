@@ -1,10 +1,8 @@
-import pickle
 from multiprocessing.dummy import Pool as ThreadPool
 from api import _load_json
 import schedule
 from datetime import datetime
-import psycopg2
-from database import INPUT_TABLE_NAME, Database as db
+from database import Database as db
 from api_types import TimestampTableType
 
 URL_items = r"https://m.avito.ru/api/9/items?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&" \
