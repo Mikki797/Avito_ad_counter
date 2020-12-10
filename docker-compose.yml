@@ -8,7 +8,7 @@ services:
   server:
     build: api/
     container_name: avito_test_server
-    command: python main.py
+    command: python server.py
     depends_on:
       - db
     restart: always

@@ -1,1 +1,1 @@
-"Description" 
+Тестовое задание для стажера в Market Intelligence

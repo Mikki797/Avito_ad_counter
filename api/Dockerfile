@@ -3,7 +3,7 @@ FROM python:3.7.9-slim
 ADD api.py /api/
 ADD api_types.py /api/
 ADD database.py /api/
-ADD main.py /api/
+ADD server.py /api/
 
 ADD requirements.txt /api/
 
