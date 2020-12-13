@@ -10,7 +10,6 @@ DB_PASSWORD = 'admin'
 DB_HOST = 'avito_test_db'
 DB_PORT = '5432'
 
-
 INPUT_TABLE_NAME = 'requests'
 OUTPUT_TABLE_NAME = 'timeStamps'
 
