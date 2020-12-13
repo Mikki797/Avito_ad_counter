@@ -122,7 +122,7 @@ class Database:
         cursor.execute(query)
 
     @staticmethod
-    def get_timestamps(item: StatInputType) -> List[Tuple[int, int]]:
+    def get_timestamps(item: StatInputType) -> List[Tuple[str, ]]:
         """
         Get stat for 'item' from table 'timestamps'. item.id is id of request, item.date1 is timestamp start of
         interval, item.date2 is timestamp end of the interval.
@@ -134,7 +134,7 @@ class Database:
 
         Returns
         -------
-        List[Tuple[str,]]
+        List[Tuple[str, ]]
             Tuples contains str like '(timeStamp,count)'
         """
         con = _create_connection(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT)
@@ -146,5 +146,4 @@ class Database:
         cursor.execute(query)
 
         result = cursor.fetchall()
-        print(result)
         return result
