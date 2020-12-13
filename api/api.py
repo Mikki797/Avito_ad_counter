@@ -8,7 +8,7 @@ from typing import Dict, Any, Optional
 from api_types import AddInputType, StatInputType
 from database import Database as db
 
-URL_locations = r"https://m.avito.ru/api/1/slocations?key=af0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&limit=5&" \
+URL_locations = r"https://m.avito.ru/api/1/slocations?key=f0deccbgcgidddjgnvljitntccdduijhdinfgjgfjir&limit=5&" \
                 r"q={location}"
 
 
@@ -18,9 +18,12 @@ def _load_json(url: str) -> Dict[Any, Any]:
     response = session.get(url)
     try:
         json_data = response.json()
-        return json_data
     except json.decoder.JSONDecodeError:
-        raise RuntimeError(f'Доступ по ссылке {url} заблокирован')
+        raise HTTPException(403, f'Доступ по ссылке {url} заблокирован')
+
+    if json_data.get('error') is not None:
+        raise HTTPException(json_data.get('error').get('code'), json_data.get('error').get('message'))
+    return json_data
 
 
 app = FastAPI(title='avito-test')
