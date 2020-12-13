@@ -1,3 +1,8 @@
+"""
+JSON API Service on FastApi and uvicorn server
+"""
+
+
 import requests
 import json
 

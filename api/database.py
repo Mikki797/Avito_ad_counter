@@ -1,20 +1,21 @@
 import psycopg2
+from psycopg2.extensions import connection as psycopg2_con
 
 from typing import Iterable, List, Tuple
 
 from api_types import AddInputType, StatInputType, TimestampTableType
 
-DB_NAME = 'avito_api_test'
+DB_NAME = 'avito_api_db'
 DB_USER = 'postgres'
 DB_PASSWORD = 'admin'
-DB_HOST = '127.0.0.1'
+DB_HOST = 'avito_test_db'
 DB_PORT = '5432'
 
 INPUT_TABLE_NAME = 'requests'
 OUTPUT_TABLE_NAME = 'timeStamps'
 
 
-def _create_connection(dbname, user, password, host, port):
+def _create_connection(dbname: str, user: str, password: str, host: str, port: str) -> psycopg2_con:
     """
     Get connect to database
 
@@ -30,6 +31,11 @@ def _create_connection(dbname, user, password, host, port):
         Database: host (name of docker container if docker used)
     port: str
         Port to connect to database
+
+    Returns
+    -------
+    psycopg2_con
+        Connection to database psycopg2.extensions.connection
     """
     con = psycopg2.connect(dbname=dbname, user=user, password=password, host=host, port=port)
     return con
@@ -74,7 +80,7 @@ class Database:
         return result[0][0]
 
     @staticmethod
-    def get_requests(size=10) -> Iterable[List[int]]:
+    def get_requests(size=10) -> Iterable[List[Tuple[str, ]]]:
         """
         Connect to database and get rows from table 'requests'.
 
@@ -85,8 +91,8 @@ class Database:
 
         Returns
         -------
-        Iterable[List[int]]
-            Generator of list size of 'size' which contains rows (id, query, locationId) from table 'requests'
+        Iterable[List[Tuple[str, ]]]
+            Generator of list size of 'size' which contains str like "(id,query,locationId)" from table 'requests'
         """
         con = _create_connection(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT)
         con.autocommit = True
@@ -135,7 +141,7 @@ class Database:
         Returns
         -------
         List[Tuple[str, ]]
-            Tuples contains str like '(timeStamp,count)'
+            Tuples contains str like "(timeStamp,count)"
         """
         con = _create_connection(dbname=DB_NAME, user=DB_USER, password=DB_PASSWORD, host=DB_HOST, port=DB_PORT)
         con.autocommit = True

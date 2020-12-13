@@ -1,3 +1,8 @@
+"""
+Service which get count of ads for every record in table 'requests' every hour
+"""
+
+
 import schedule
 
 from multiprocessing.dummy import Pool as ThreadPool
@@ -21,7 +26,7 @@ def get_count(record):
     record: Tuple[int, str, int]
         Row from table 'requests' (id, query, locationId)
     """
-    id, query, locationId= record
+    id, query, locationId = record
 
     timeStamp = int(datetime.now().timestamp())
     json_data = _load_json(URL_items.format(query=query, locationId=locationId))
