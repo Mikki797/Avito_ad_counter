@@ -12,7 +12,16 @@ URL_items = r"https://m.avito.ru/api/9/items?key=af0deccbgcgidddjgnvljitntccddui
 
 
 def get_count(record):
-    id, query, locationId = record
+    """
+    Get count of ads from Avito api for record (id, query, locationId) and add record like (id, timeStamp, count) to
+    table 'timeStamps'
+
+    Parameters
+    ----------
+    record: Tuple[int, str, int]
+        Row from table 'requests' (id, query, locationId)
+    """
+    id, query, locationId= record
 
     timeStamp = int(datetime.now().timestamp())
     json_data = _load_json(URL_items.format(query=query, locationId=locationId))
@@ -23,6 +32,9 @@ def get_count(record):
 
 
 def main_func():
+    """
+    Get all requests from database table 'requests' and paralleling it.
+    """
     for record_list in db.get_requests(size=10):
         pool = ThreadPool()
         pool.map(get_count, record_list)
