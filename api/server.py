@@ -45,7 +45,7 @@ def main_func():
         pool.map(get_count, record_list)
 
 
-schedule.every().minute.do(main_func)
+schedule.every().hour.do(main_func)
 
 while True:
     schedule.run_pending()
